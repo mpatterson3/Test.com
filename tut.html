@@ -1,0 +1,127 @@
+<!DOCTYPE html >
+<html>
+<head>
+	<title>title</title>
+	<style>
+	html, body{
+		margin:0px;
+		
+	}
+	#mpCanvas{
+		display:block;
+		background-color:black;
+	}
+	</style>
+</head>
+
+<body>
+<canvas id="mpCanvas"></canvas>
+<script>
+
+window.onload=function(){
+	var deltaTime;
+	var speed = 5;
+	var player = {};
+	var n=0;
+		
+		
+
+	Vector2 = function(x,y){
+      	this.previousX,this.previousY;
+      	this.x = x;
+      	this.y = y;
+      	this.set = function(x,y){
+      		this.previousX = this.x;
+      		this.previousY = this.y;
+      		this.x = x;
+      		this.y = y;
+      	}; 
+      	this.add = function(v){
+      		var newX = v.x + this.x;
+      		var newY = v.y + this.y;
+      		return new Vector2(newX, newY);
+      	};
+        this.subtract = function(v){
+      		var newX = this.x - v.x;
+      		var newY = this.y - v.y;
+      		return new Vector2(newX, newY);
+      	};
+        this.multiply = function(v){
+      		return new Vector2(this.x*v.x, this.y*v.y);
+      	};
+		this.scale = function(x){
+      		return new Vector2(this.x*x, this.y*x);
+      	};
+        this.divide = function(v){
+      		var newX = this.x / v.x;
+      		var newY = this.y / v.y;
+      		return new Vector2(newX, newY);
+      	};
+        this.length = function(){
+			return Math.sqrt((this.x * this.x) +(this.y * this.y)) ;
+		};
+		this.lengthSquared = function(){
+			return (this.x *this.x) +(this.y*this.y) ;
+		};
+		this.normalize = function(){
+			var newX = this.x / this.length();
+      		var newY = this.y / this.length();
+			return new Vector2(newX,newY);
+		};
+	}
+	var lastUpdate = new Date().getTime();
+	var canvas = document.getElementById("mpCanvas"),
+		context = canvas.getContext('2d'),
+		width = canvas.width=window.innerWidth,
+		height = canvas.height=window.innerHeight;
+		//context.fillRect(0,0,width,height);
+		context.fillStyle="blue";
+		
+	var init = function(){
+		document.addEventListener('keydown',handleInput);
+
+		player.position =  new Vector2(0,0);
+		player.playerSpeed = 50,
+		player.accelaration = 1;
+		player.velocity =new Vector2(0,0);
+
+		loop();
+	};
+	var update = function(){
+	
+		var currentUpdate = new Date().getTime();
+			deltaTime = currentUpdate-lastUpdate;
+			lastUpdate = currentUpdate;
+			if(deltaTime>15)deltaTime=15;
+			
+			
+			player.position = player.position.add(player.velocity);
+			//if(player.position.x<0 || player.position.x>250)player.playerSpeed*=-1;
+		};
+	var render = function(){
+			context.clearRect(0,0,width,height);
+			context.fillRect(player.position.x,player.position.y,32,32);
+			console.log(player.position);
+		};
+	var handleInput = function(e){
+
+		if(e){
+			console.log(e.keyCode);
+			if(e.keyCode==37){
+				player.velocity.add(new Vector2(1,0));
+			}
+		}
+	}
+	var loop = function(){
+		handleInput();
+		update();
+		render();
+		requestAnimationFrame(loop,canvas);
+	};
+	init();
+}
+
+
+</script>
+</body>
+</html>

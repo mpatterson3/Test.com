@@ -1,0 +1,147 @@
+<html>
+   <head>
+      <title>MPEEZY</title>
+	 <!--  <script type="text/javascript" src="scripts\Box2dWeb-2.1.a.3.min.js"></script> -->
+	  
+   </head>
+   <body>
+      <canvas id="canvas" width="600" height="400" style="background-color:#333333;" ></canvas>
+	  <script type="text\html" src="C:\Users\mpatterson\Desktop\test.com\scripts\Game2.js"></script>
+    <script>
+	  (function(){
+	    var Game = Game || {};
+		var KEY_LEFT = 37;
+		var KEY_RIGHT = 39;
+		var KEY_UP = 38;
+		var KEY_DOWN = 40;
+		var KEY_SPACE = 32;
+		var lastUpdate = Date.now();
+	 playerSpeed=75;
+	Game.input = function(e){
+	if(e){
+		Game.player.moving = true;
+		if(e.keyCode == KEY_LEFT){
+			Game.player.movingLeft=true;
+		}else{
+			Game.player.movingLeft=false;
+		}
+		if(e.keyCode == KEY_RIGHT){
+			Game.player.movingRight = true;
+		}else{
+			Game.player.movingRight=false;
+		}
+		if(e.keyCode == KEY_UP){
+			Game.player.movingUp = true;
+		}else{
+			Game.player.movingUp=false;
+		}
+		if(e.keyCode == KEY_DOWN){
+			Game.player.movingDown = true;
+			}else{
+			Game.player.movingDown=true;
+		}}else{
+			Game.player.moving = false;
+		}
+		
+	};
+	Game.update = function(){
+		var deltaTime = Date.now()-lastUpdate;
+		lastUpdate = Date.now();
+		if(deltaTime>15)deltaTime=15;
+		Game.player.position = Game.player.position.lerp(Game.player.position,new Game.Vector2(1,-5),.5).add(new Game.Vector2(0,1));
+		console.log("DeltaTime :" + deltaTime);
+		console.log("Position: " + Game.player.position.toString());
+		console.log("Velocity:" + Game.player.velocity.toString());
+	};
+	Game.draw = function(){
+		Game.context.clearRect(0,0,Game.canvas.width,Game.canvas.height);
+		Game.context.fillStyle = "Blue";
+		Game.context.fillRect(Game.player.position.x,Game.player.position.y,25,10);
+	};
+	Game.quit = function(){
+		Game.running = false;
+	}
+	Game.loop = function(){
+		Game.input();
+		Game.update();
+		Game.draw();
+		if(Game.running){
+			requestAnimationFrame(Game.loop);
+			}
+	};
+	
+	Game.Vector2 = function(x,y){
+      	this.previousX,this.previousY;
+      	this.x = x;
+      	this.y = y;
+      	this.set = function(x,y){
+      		this.previousX = this.x;
+      		this.previousY = this.y;
+      		this.x = x;
+      		this.y = y;
+      	}; 
+      	this.add = function(v){
+      		var newX = v.x + this.x;
+      		var newY = v.y + this.y;
+      		return new Game.Vector2(newX, newY);
+      	};
+        this.subtract = function(v){
+      		var newX = this.x - v.x;
+      		var newY = this.y - v.y;
+      		return new Game.Vector2(newX, newY);
+      	};
+        this.multiply = function(x){
+      		return new Game.Vector2(this.x*x, this.y*x);
+      	};
+        this.divide = function(v){
+      		var newX = this.x / v.x;
+      		var newY = this.y / v.y;
+      		return new Game.Vector2(newX, newY);
+      	};
+        this.length = function(){
+			return Math.sqrt((this.x * this.x) +(this.y * this.y)) ;
+		};
+		this.lengthSquared = function(){
+			return (this.x *this.x) +(this.y*this.y) ;
+		};
+		this.normalize = function(){
+			var newX = this.x / this.length();
+      		var newY = this.y / this.length();
+			return new Game.Vector2(newX,newY);
+		};
+		this.inverse = function(){
+			return new Game.Vector2(-this.x,-this.y)
+		};
+		this.toString = function(){
+			return "(" + this.x + ", " + this.y + ")";
+		};
+		this.lerp = function(start,end, perc){
+
+			return start.add(end.multiply(perc));
+		}
+		
+      }
+
+	  Game.init = function(){
+		Game.canvas = document.getElementById('canvas');
+		Game.context = canvas.getContext('2d');
+		Game.running = true;
+		document.addEventListener('keydown',Game.input);
+		Game.player = new Game.Player();
+		Game.Left = new Game.Vector2(-1,0);
+		Game.Right = new Game.Vector2(1,0);
+		Game.Up = new Game.Vector2(0,1);
+		Game.Down = new Game.Vector2(0,1);
+		Game.loop();
+	};
+	Game.Player = function(){
+			this.velocity = new Game.Vector2(1,0);
+			this.position = new Game.Vector2(0,500);
+		};
+	  Game.init();
+    })();
+      </script>
+   </body>
+  
+   
+</html>

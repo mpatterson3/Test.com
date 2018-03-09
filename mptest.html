@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<canvas width="800" height="640" id="mp"></canvas>
+<script>
+document.onload = function(){
+	var lastTime;
+	var _velocity;
+	var canvas = document.querySelector('#mp');
+	var ctx = canvas.getContext('2d');
+	var x=0;
+	var y=canvas.height-20;
+	var gravity;
+	function loop(){
+		update();
+		render();		
+		window.requestAnimationFrame(loop);
+	}
+	function init(){
+		gravity = new vector(0,200);
+		input.init();
+		position = new vector(x,y);
+		lastTime = new Date();
+		moveSpeed = 10;
+		resourceLoader.loadImages([{"name":"player","filename":"images/player.png"},{"name":"enemy","filename":"images/player.png"}]);
+		_velocity = new vector(0,0);
+		loop();
+
+	}
+	var input = {
+		init:function(){
+			document.addEventListener('keydown',input.onkeydown);
+			document.addEventListener('keyup',input.onkeyup);
+		},
+		onkeyup:function(e){
+			if(e){
+				_velocity = new vector(0,0);
+			}
+		},
+		onkeydown:function (e){
+		
+		if(!e){
+			return
+		}else{
+			e.preventDefault();
+			//console.log(e.keyCode);
+			var key = e.keyCode;
+			switch(key){
+				case 37:
+					_velocity=_velocity.add(new vector(-1,0));
+					break;
+				
+				case 38:
+				 	_velocity=_velocity.add(new vector(0,-1));
+				 	break;
+				
+				case 39:
+					_velocity=_velocity.add(new vector(1,0));
+					break;
+				
+				// case 40:
+				// 	_velocity=_velocity.add(new vector(0,1));
+				// 	break;	
+				
+				default:
+					_velocity=_velocity.add(new vector(0,0));
+			}
+		}
+	}
+	};
+	
+	function render(){
+		ctx.clearRect(0,0,800,640);
+		ctx.fillStyle="#0099FF";
+		ctx.fillRect(position.x,position.y,10,10);
+		
+	}
+	function update(){
+		
+		var currentTime = new Date();
+		var dt  = (currentTime-lastTime)/1000;
+		if(dt>.016)dt=.016;
+		lastTime = currentTime;
+		keepPlayerInBounds(position);	
+		var gravityStep = gravity.scale(dt);
+		if(position.y==0)gravityStep=new vector(0,0);
+		if(_velocity){
+			velocity = physics.lerp(position,position.add(_velocity),dt);
+			velocity = velocity.add(velocity.scale(moveSpeed).add(gravityStep));	
+			//velocity = _velocity.add(_velocity.scale(dt*moveSpeed));
+		}else{
+			velocity = new vector(0,0);
+		}
+		
+		position = position.add(velocity);
+
+		console.log(position);
+	}
+	function keepPlayerInBounds(pos){
+		if(pos.x<canvas.width && pos.x>0 && pos.y<canvas.height && pos.y>0){
+			return;
+		}
+		if(pos.x >canvas.width-10){
+			pos.x=canvas.width-10;
+		}
+		if(pos.y >canvas.height-20){
+			pos.y=canvas.height-20;
+		}
+		if(position.x<0)position.x=0;
+		if(position.y<0)position.y=0;
+	}
+	function player(){
+		this.position;
+		this.sprite;
+		this.lives;
+		this.score;
+
+		this.init = function(){
+			score=0;
+		};		
+	}
+	var resourceLoader = {
+		loadedImages:0,
+		loadedSounds:0,
+		loaded:false,
+		loadedImageArray:[],
+
+		loadImages:function(imageArray){
+			for(var i=0;i<imageArray.length;i++){
+				var image = new Image();
+				var filename = imageArray[i].filename;
+				image.src = filename;
+				image.onload = function(){
+					resourceLoader.loadedImages++;
+				}
+				
+			}
+		}
+	}
+	function audio(){
+		
+	}
+	function vector(x,y){
+		this.previousX = this.x || 0;
+		this.previousY = this.y || 0;
+		this.x = x;
+		this.y = y;
+		this.set = function(x,y){
+			this.x = x;
+			this.y = y;
+		};
+		this.add = function(v){
+			return new vector(this.x+v.x,this.y+v.y);
+		};
+		this.sub = function(v){
+			return new vector(this.x-v.x,this.y-v.y);
+		};
+		this.mult = function(v){
+			return new vector(this.x*v.x,this.y*v.y);
+		};
+		this.div = function(v){
+			return new vector(this.x/v.x,this.y/v.y);
+		};
+		this.scale = function(s){
+			return new vector(this.x*s,this.y*s);
+		};
+		this.magnitude = function(){
+			return Math.sqrt(x*x+y*y);
+		};
+		this.normalize = function(v){
+			return this.scale(1/this.magnitude);	
+		};
+		
+	}
+	function write(msg,x,y){
+		ctx.fillStyle="white";
+		ctx.fillText(msg,x,y);
+	}
+	var physics = {
+		lerp:function(oldPos,newPos,pct){
+			return newPos.sub(oldPos).scale(pct);
+		}
+	};
+	init();
+}();
+</script>
+<style>
+	#mp{
+		background-color: #026B21;
+	}
+	
+</style>
+</body>
+</html>
